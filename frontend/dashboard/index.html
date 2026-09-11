@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Search &amp; Rescue Intelligence Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="/static/logo.png" alt="ResQ Tech" class="brand-logo" />
+      </div>
+      <nav class="side-nav">
+        <a href="#sec-overview" class="side-link active" data-target="sec-overview">Overview</a>
+        <a href="#sec-cameras" class="side-link" data-target="sec-cameras">Cameras</a>
+        <a href="#sec-analytics" class="side-link" data-target="sec-analytics">Analytics</a>
+        <a href="#sec-history" class="side-link" data-target="sec-history">History</a>
+      </nav>
+      <div class="sidebar-foot">
+        <span class="meta-chip status-pill status-offline" id="system-status">CONNECTING</span>
+        <p class="disclaimer-note">AI-assisted priority estimate, not a diagnosis. HIGH/CRITICAL need operator verification.</p>
+      </div>
+    </aside>
+
+    <div class="main-col">
+      <header class="topbar">
+        <div class="topbar-title">
+          <span class="clock-big" id="clock">--:--:--</span>
+        </div>
+      </header>
+
+      <div class="disclaimer-bar" hidden>
+        Priority scores are an <strong>AI-Assisted Rescue Priority Estimation</strong> from observable signals
+        &mdash; not a medical diagnosis. HIGH/CRITICAL require operator verification before action.
+      </div>
+
+      <main class="content">
+
+        <section id="sec-overview" class="scroll-anchor">
+          <div class="kpi-row">
+            <div class="kpi-card">
+              <span class="kpi-label">Active Cameras</span>
+              <span class="kpi-value" id="kpi-cameras">0</span>
+              <span class="kpi-sub" id="kpi-cameras-sub">of 0 configured</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-label">People Detected</span>
+              <span class="kpi-value" id="kpi-people">0</span>
+              <span class="kpi-sub">across all cameras</span>
+            </div>
+            <div class="kpi-card kpi-high">
+              <span class="kpi-label">High Priority</span>
+              <span class="kpi-value" id="kpi-high">0</span>
+              <span class="kpi-sub">review suggested</span>
+            </div>
+            <div class="kpi-card kpi-critical">
+              <span class="kpi-label">Critical</span>
+              <span class="kpi-value" id="kpi-critical">0</span>
+              <span class="kpi-sub">verification required</span>
+            </div>
+          </div>
+
+          <div class="panel video-panel">
+            <div class="panel-header">
+              <h2>Camera View</h2>
+              <div class="video-controls">
+                <select id="camera-select" title="Choose camera"></select>
+                <span class="source-tag" id="camera-source-tag">RGB</span>
+              </div>
+            </div>
+            <div class="camera-strip" id="camera-strip"></div>
+            <div class="video-frame" id="video-frame">
+              <img id="video" alt="Live camera feed" />
+              <div class="video-empty" id="video-empty">No cameras configured</div>
+            </div>
+            <div class="subjects-list" id="subjects-list">
+              <div class="empty-note">No subjects currently in frame</div>
+            </div>
+          </div>
+
+          <div class="panel events-panel">
+            <div class="panel-header">
+              <h2>Live Rescue Events</h2>
+            </div>
+            <ul class="event-list" id="event-list">
+              <li class="empty-row">No events yet</li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="sec-cameras" class="scroll-anchor">
+          <div class="panel cameras-panel">
+            <div class="panel-header">
+              <h2>Cameras</h2>
+              <button class="btn-primary" id="add-camera-btn" type="button">+ Add Camera</button>
+            </div>
+
+            <form class="add-camera-form" id="add-camera-form" hidden>
+              <div class="form-row">
+                <label>Name<input type="text" id="cam-name" placeholder="e.g. North Ridge" /></label>
+                <label>Type
+                  <select id="cam-source-type">
+                    <option value="webcam">Webcam</option>
+                    <option value="file">Video file</option>
+                  </select>
+                </label>
+                <label id="cam-ref-webcam-wrap">Device
+                  <select id="cam-ref-webcam"></select>
+                </label>
+                <label id="cam-ref-file-wrap" hidden>File path<input type="text" id="cam-ref-file" placeholder="/path/to/clip.mp4" /></label>
+                <label>Source
+                  <select id="cam-source">
+                    <option value="RGB">RGB</option>
+                    <option value="THERMAL">Thermal (not yet implemented)</option>
+                  </select>
+                </label>
+              </div>
+              <div class="form-actions">
+                <span class="form-status" id="add-camera-status"></span>
+                <button type="button" class="btn-ghost" id="cam-rescan-btn">Rescan webcams</button>
+                <button type="submit" class="btn-primary">Add</button>
+                <button type="button" class="btn-ghost" id="cam-cancel-btn">Cancel</button>
+              </div>
+            </form>
+
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Camera</th>
+                    <th>Source</th>
+                    <th>Status</th>
+                    <th>People</th>
+                    <th>Priority</th>
+                    <th>FPS</th>
+                    <th>Resolution</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="cameras-body">
+                  <tr class="empty-row"><td colspan="8">Loading cameras…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-analytics" class="scroll-anchor">
+          <div class="analytics-grid">
+            <div class="panel chart-panel">
+              <div class="panel-header"><h2>People Over Time</h2></div>
+              <div class="chart-host" id="chart-people-time"></div>
+            </div>
+            <div class="panel chart-panel">
+              <div class="panel-header"><h2>Priority Distribution</h2></div>
+              <div class="chart-host" id="chart-priority"></div>
+            </div>
+            <div class="panel chart-panel">
+              <div class="panel-header"><h2>Camera Activity</h2></div>
+              <div class="chart-host" id="chart-activity"></div>
+            </div>
+            <div class="panel chart-panel">
+              <div class="panel-header"><h2>Detection Confidence</h2></div>
+              <div class="chart-host" id="chart-confidence"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="sec-history" class="scroll-anchor">
+          <div class="panel history-panel">
+            <div class="panel-header">
+              <h2>Tracking Records</h2>
+              <select id="history-camera-filter"><option value="">All cameras</option></select>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Camera</th>
+                    <th>Confidence</th>
+                    <th>Posture</th>
+                    <th>Movement</th>
+                    <th>First Seen</th>
+                    <th>Last Seen</th>
+                    <th>Duration</th>
+                    <th>Max Priority</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="history-body">
+                  <tr class="empty-row"><td colspan="10">Waiting for detections…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="/static/charts.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
