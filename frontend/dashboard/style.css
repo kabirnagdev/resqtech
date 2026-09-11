@@ -72,13 +72,6 @@ body {
 
 .sidebar-foot { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
 .sidebar-foot .meta-chip { display: block; width: 100%; text-align: center; box-sizing: border-box; }
-.disclaimer-note {
-  margin: 0;
-  font-size: 9.5px;
-  line-height: 1.4;
-  color: var(--text-muted);
-  text-align: center;
-}
 
 .main-col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 
@@ -86,10 +79,13 @@ body {
 .topbar {
   display: flex;
   align-items: center;
+  gap: 14px;
   padding: 10px 20px;
   background: var(--panel);
   border-bottom: 1px solid var(--border);
 }
+
+.topbar-logo { display: block; height: 32px; width: auto; }
 
 .topbar-title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 
@@ -118,16 +114,6 @@ body {
 .status-pill { font-weight: 700; letter-spacing: 0.03em; }
 .status-online { color: var(--low); background: var(--low-soft); border-color: transparent; }
 .status-offline { color: var(--critical); background: var(--critical-soft); border-color: transparent; }
-
-.disclaimer-bar {
-  font-size: 10.5px;
-  line-height: 1.4;
-  color: var(--text-muted);
-  background: var(--panel-alt);
-  border-bottom: 1px solid var(--border);
-  padding: 6px 20px;
-}
-.disclaimer-bar strong { color: var(--text); }
 
 /* -- content grid: dense bento layout ---------------------------------------- */
 .content {
@@ -437,7 +423,6 @@ tbody tr.row-selected { background: var(--accent-soft); }
   .side-nav { flex-direction: row; }
   .sidebar-foot { margin-top: 0; margin-left: auto; flex-direction: row; align-items: center; }
   .sidebar-foot .meta-chip { white-space: nowrap; }
-  .sidebar-foot .disclaimer-note { display: none; }
 }
 
 @media (max-width: 620px) {
